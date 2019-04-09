@@ -6,6 +6,7 @@ import { Port } from "./port";
 import * as Consts from "./consts";
 
 import Debug = require("debug");
+import { IBLEDevice } from "./interfaces";
 const debug = Debug("puphub");
 
 
@@ -32,12 +33,14 @@ export class PUPHub extends LPF2Hub {
 
 
     public static IsPUPHub (peripheral: Peripheral) {
-        return (peripheral.advertisement.serviceUuids.indexOf(Consts.BLEService.LPF2_HUB.replace(/-/g, "")) >= 0 && peripheral.advertisement.manufacturerData[3] === Consts.BLEManufacturerData.POWERED_UP_HUB_ID);
+        return (peripheral.advertisement &&
+            peripheral.advertisement.serviceUuids &&
+            peripheral.advertisement.serviceUuids.indexOf(Consts.BLEService.LPF2_HUB.replace(/-/g, "")) >= 0 && peripheral.advertisement.manufacturerData[3] === Consts.BLEManufacturerData.POWERED_UP_HUB_ID);
     }
 
 
-    constructor (peripheral: Peripheral, autoSubscribe: boolean = true) {
-        super(peripheral, autoSubscribe);
+    constructor (device: IBLEDevice, autoSubscribe: boolean = true) {
+        super(device, autoSubscribe);
         this.type = Consts.HubType.POWERED_UP_HUB;
         this._ports = {
             "A": new Port("A", 0),

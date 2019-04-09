@@ -17,6 +17,14 @@ export enum HubType {
 }
 
 
+// tslint:disable-next-line
+export let HubTypeNames = Object.keys(HubType).reduce((result: {[hubType: string]: string}, item) => {
+    // @ts-ignore
+    result[HubType[item]] = item;
+    return result;
+}, {});
+
+
 /**
  * @typedef DeviceType
  * @property {number} UNKNOWN 0
@@ -56,6 +64,14 @@ export enum DeviceType {
 }
 
 
+// tslint:disable-next-line
+export let DeviceTypeNames = Object.keys(DeviceType).reduce((result: {[deviceType: string]: string}, item) => {
+    // @ts-ignore
+    result[DeviceType[item]] = item;
+    return result;
+}, {});
+
+
 /**
  * @typedef Color
  * @property {number} BLACK 0
@@ -85,6 +101,14 @@ export enum Color {
     WHITE = 10,
     NONE = 255
 }
+
+
+// tslint:disable-next-line
+export let ColorNames = Object.keys(Color).reduce((result: {[color: string]: string}, item) => {
+    // @ts-ignore
+    result[Color[item]] = item;
+    return result;
+}, {});
 
 
 /**
@@ -131,6 +155,10 @@ export enum BLEManufacturerData {
 
 export enum BLEService {
     WEDO2_SMART_HUB = "00001523-1212-efde-1523-785feabcd123",
+    WEDO2_SMART_HUB_2 = "00004f0e-1212-efde-1523-785feabcd123",
+    WEDO2_SMART_HUB_3 = "2a19",
+    WEDO2_SMART_HUB_4 = "180f",
+    WEDO2_SMART_HUB_5 = "180a",
     LPF2_HUB = "00001623-1212-efde-1623-785feabcd123"
 }
 
@@ -142,7 +170,8 @@ export enum BLECharacteristic {
     WEDO2_PORT_TYPE = "00001527-1212-efde-1523-785feabcd123", // "1527" // Handles plugging and unplugging of devices on WeDo 2.0 Smart Hub
     WEDO2_LOW_VOLTAGE_ALERT = "00001528-1212-efde-1523-785feabcd123", // "1528"
     WEDO2_HIGH_CURRENT_ALERT = "00001529-1212-efde-1523-785feabcd123", // "1529"
-    WEDO2_LOW_SIGNAL_ALERT = "0000152a-1212-efde-1523-785feabcd123", // "152a"
+    WEDO2_LOW_SIGNAL_ALERT = "0000152a-1212-efde-1523-785feabcd123", // "152a",
+    WEDO2_DISCONNECT = "0000152b-1212-efde-1523-785feabcd123", // "152b"
     WEDO2_SENSOR_VALUE = "00001560-1212-efde-1523-785feabcd123", // "1560"
     WEDO2_VALUE_FORMAT = "00001561-1212-efde-1523-785feabcd123", // "1561"
     WEDO2_PORT_TYPE_WRITE = "00001563-1212-efde-1523-785feabcd123", // "1563"

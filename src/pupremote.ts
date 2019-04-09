@@ -6,6 +6,7 @@ import { Port } from "./port";
 import * as Consts from "./consts";
 
 import Debug = require("debug");
+import { IBLEDevice } from "./interfaces";
 const debug = Debug("pupremote");
 
 
@@ -57,12 +58,14 @@ export class PUPRemote extends LPF2Hub {
 
 
     public static IsPUPRemote (peripheral: Peripheral) {
-        return (peripheral.advertisement.serviceUuids.indexOf(Consts.BLEService.LPF2_HUB.replace(/-/g, "")) >= 0 && peripheral.advertisement.manufacturerData[3] === Consts.BLEManufacturerData.POWERED_UP_REMOTE_ID);
+        return (peripheral.advertisement &&
+            peripheral.advertisement.serviceUuids &&
+            peripheral.advertisement.serviceUuids.indexOf(Consts.BLEService.LPF2_HUB.replace(/-/g, "")) >= 0 && peripheral.advertisement.manufacturerData[3] === Consts.BLEManufacturerData.POWERED_UP_REMOTE_ID);
     }
 
 
-    constructor (peripheral: Peripheral, autoSubscribe: boolean = true) {
-        super(peripheral, autoSubscribe);
+    constructor (device: IBLEDevice, autoSubscribe: boolean = true) {
+        super(device, autoSubscribe);
         this.type = Consts.HubType.POWERED_UP_REMOTE;
         this._ports = {
             "LEFT": new Port("LEFT", 0),

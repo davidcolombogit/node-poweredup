@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>node-poweredup Source: consts.js</title>
+	<title>node-poweredup Source: poweredup-node.js</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -79,183 +79,152 @@
 		<div id="main">
 			
 
-		<h1 class="page-title">Source: consts.js</h1>
+		<h1 class="page-title">Source: poweredup-node.js</h1>
     
 <section>
     <article>
         <pre
             class="sunlight-highlight-javascript linenums">"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const boostmovehub_1 = require("./boostmovehub");
+const duplotrainbase_1 = require("./duplotrainbase");
+const nobledevice_1 = require("./nobledevice");
+const puphub_1 = require("./puphub");
+const pupremote_1 = require("./pupremote");
+const wedo2smarthub_1 = require("./wedo2smarthub");
+const events_1 = require("events");
+const Debug = require("debug");
+const debug = Debug("poweredup");
+const noble = require("noble-mac");
+let ready = false;
+let wantScan = false;
+let discoveryEventAttached = false;
+const startScanning = () => {
+    noble.startScanning();
+};
+noble.on("stateChange", (state) => {
+    ready = (state === "poweredOn");
+    if (ready) {
+        if (wantScan) {
+            debug("Scanning started");
+            startScanning();
+        }
+    }
+    else {
+        noble.stopScanning();
+    }
+});
 /**
- * @typedef HubType
- * @property {number} UNKNOWN 0
- * @property {number} WEDO2_SMART_HUB 1
- * @property {number} BOOST_MOVE_HUB 2
- * @property {number} POWERED_UP_HUB 3
- * @property {number} POWERED_UP_REMOTE 4
- * @property {number} DUPLO_TRAIN_HUB 5
+ * @class PoweredUP
+ * @extends EventEmitter
  */
-var HubType;
-(function (HubType) {
-    HubType[HubType["UNKNOWN"] = 0] = "UNKNOWN";
-    HubType[HubType["WEDO2_SMART_HUB"] = 1] = "WEDO2_SMART_HUB";
-    HubType[HubType["BOOST_MOVE_HUB"] = 2] = "BOOST_MOVE_HUB";
-    HubType[HubType["POWERED_UP_HUB"] = 3] = "POWERED_UP_HUB";
-    HubType[HubType["POWERED_UP_REMOTE"] = 4] = "POWERED_UP_REMOTE";
-    HubType[HubType["DUPLO_TRAIN_HUB"] = 5] = "DUPLO_TRAIN_HUB";
-})(HubType = exports.HubType || (exports.HubType = {}));
-// tslint:disable-next-line
-exports.HubTypeNames = Object.keys(HubType).reduce((result, item) => {
-    // @ts-ignore
-    result[HubType[item]] = item;
-    return result;
-}, {});
-/**
- * @typedef DeviceType
- * @property {number} UNKNOWN 0
- * @property {number} BASIC_MOTOR 1
- * @property {number} TRAIN_MOTOR 2
- * @property {number} LED_LIGHTS 8
- * @property {number} BOOST_LED 22
- * @property {number} WEDO2_TILT 34
- * @property {number} WEDO2_DISTANCE 35
- * @property {number} BOOST_DISTANCE 37
- * @property {number} BOOST_TACHO_MOTOR 38
- * @property {number} BOOST_MOVE_HUB_MOTOR 39
- * @property {number} BOOST_TILT 40
- * @property {number} DUPLO_TRAIN_BASE_MOTOR 41
- * @property {number} DUPLO_TRAIN_BASE_SPEAKER 42
- * @property {number} DUPLO_TRAIN_BASE_COLOR 43
- * @property {number} DUPLO_TRAIN_BASE_SPEEDOMETER 44
- * @property {number} POWERED_UP_REMOTE_BUTTON 55
- */
-var DeviceType;
-(function (DeviceType) {
-    DeviceType[DeviceType["UNKNOWN"] = 0] = "UNKNOWN";
-    DeviceType[DeviceType["BASIC_MOTOR"] = 1] = "BASIC_MOTOR";
-    DeviceType[DeviceType["TRAIN_MOTOR"] = 2] = "TRAIN_MOTOR";
-    DeviceType[DeviceType["LED_LIGHTS"] = 8] = "LED_LIGHTS";
-    DeviceType[DeviceType["BOOST_LED"] = 22] = "BOOST_LED";
-    DeviceType[DeviceType["WEDO2_TILT"] = 34] = "WEDO2_TILT";
-    DeviceType[DeviceType["WEDO2_DISTANCE"] = 35] = "WEDO2_DISTANCE";
-    DeviceType[DeviceType["BOOST_DISTANCE"] = 37] = "BOOST_DISTANCE";
-    DeviceType[DeviceType["BOOST_TACHO_MOTOR"] = 38] = "BOOST_TACHO_MOTOR";
-    DeviceType[DeviceType["BOOST_MOVE_HUB_MOTOR"] = 39] = "BOOST_MOVE_HUB_MOTOR";
-    DeviceType[DeviceType["BOOST_TILT"] = 40] = "BOOST_TILT";
-    DeviceType[DeviceType["DUPLO_TRAIN_BASE_MOTOR"] = 41] = "DUPLO_TRAIN_BASE_MOTOR";
-    DeviceType[DeviceType["DUPLO_TRAIN_BASE_SPEAKER"] = 42] = "DUPLO_TRAIN_BASE_SPEAKER";
-    DeviceType[DeviceType["DUPLO_TRAIN_BASE_COLOR"] = 43] = "DUPLO_TRAIN_BASE_COLOR";
-    DeviceType[DeviceType["DUPLO_TRAIN_BASE_SPEEDOMETER"] = 44] = "DUPLO_TRAIN_BASE_SPEEDOMETER";
-    DeviceType[DeviceType["POWERED_UP_REMOTE_BUTTON"] = 55] = "POWERED_UP_REMOTE_BUTTON";
-})(DeviceType = exports.DeviceType || (exports.DeviceType = {}));
-// tslint:disable-next-line
-exports.DeviceTypeNames = Object.keys(DeviceType).reduce((result, item) => {
-    // @ts-ignore
-    result[DeviceType[item]] = item;
-    return result;
-}, {});
-/**
- * @typedef Color
- * @property {number} BLACK 0
- * @property {number} PINK 1
- * @property {number} PURPLE 2
- * @property {number} BLUE 3
- * @property {number} LIGHT_BLUE 4
- * @property {number} CYAN 5
- * @property {number} GREEN 6
- * @property {number} YELLOW 7
- * @property {number} ORANGE 8
- * @property {number} RED 9
- * @property {number} WHITE 10
- * @property {number} NONE 255
- */
-var Color;
-(function (Color) {
-    Color[Color["BLACK"] = 0] = "BLACK";
-    Color[Color["PINK"] = 1] = "PINK";
-    Color[Color["PURPLE"] = 2] = "PURPLE";
-    Color[Color["BLUE"] = 3] = "BLUE";
-    Color[Color["LIGHT_BLUE"] = 4] = "LIGHT_BLUE";
-    Color[Color["CYAN"] = 5] = "CYAN";
-    Color[Color["GREEN"] = 6] = "GREEN";
-    Color[Color["YELLOW"] = 7] = "YELLOW";
-    Color[Color["ORANGE"] = 8] = "ORANGE";
-    Color[Color["RED"] = 9] = "RED";
-    Color[Color["WHITE"] = 10] = "WHITE";
-    Color[Color["NONE"] = 255] = "NONE";
-})(Color = exports.Color || (exports.Color = {}));
-// tslint:disable-next-line
-exports.ColorNames = Object.keys(Color).reduce((result, item) => {
-    // @ts-ignore
-    result[Color[item]] = item;
-    return result;
-}, {});
-/**
- * @typedef ButtonState
- * @property {number} PRESSED 0
- * @property {number} RELEASED 1
- * @property {number} UP 2
- * @property {number} DOWN 3
- * @property {number} STOP 4
- */
-var ButtonState;
-(function (ButtonState) {
-    ButtonState[ButtonState["PRESSED"] = 0] = "PRESSED";
-    ButtonState[ButtonState["RELEASED"] = 1] = "RELEASED";
-    ButtonState[ButtonState["UP"] = 2] = "UP";
-    ButtonState[ButtonState["DOWN"] = 3] = "DOWN";
-    ButtonState[ButtonState["STOP"] = 4] = "STOP";
-})(ButtonState = exports.ButtonState || (exports.ButtonState = {}));
-/**
- * @typedef DuploTrainBaseSound
- * @property {number} BRAKE 3
- * @property {number} STATION_DEPARTURE 5
- * @property {number} WATER_REFILL 7
- * @property {number} HORN 9
- * @property {number} STEAM 10
- */
-var DuploTrainBaseSound;
-(function (DuploTrainBaseSound) {
-    DuploTrainBaseSound[DuploTrainBaseSound["BRAKE"] = 3] = "BRAKE";
-    DuploTrainBaseSound[DuploTrainBaseSound["STATION_DEPARTURE"] = 5] = "STATION_DEPARTURE";
-    DuploTrainBaseSound[DuploTrainBaseSound["WATER_REFILL"] = 7] = "WATER_REFILL";
-    DuploTrainBaseSound[DuploTrainBaseSound["HORN"] = 9] = "HORN";
-    DuploTrainBaseSound[DuploTrainBaseSound["STEAM"] = 10] = "STEAM";
-})(DuploTrainBaseSound = exports.DuploTrainBaseSound || (exports.DuploTrainBaseSound = {}));
-var BLEManufacturerData;
-(function (BLEManufacturerData) {
-    BLEManufacturerData[BLEManufacturerData["BOOST_MOVE_HUB_ID"] = 64] = "BOOST_MOVE_HUB_ID";
-    BLEManufacturerData[BLEManufacturerData["POWERED_UP_HUB_ID"] = 65] = "POWERED_UP_HUB_ID";
-    BLEManufacturerData[BLEManufacturerData["POWERED_UP_REMOTE_ID"] = 66] = "POWERED_UP_REMOTE_ID";
-    BLEManufacturerData[BLEManufacturerData["DUPLO_TRAIN_HUB_ID"] = 32] = "DUPLO_TRAIN_HUB_ID";
-})(BLEManufacturerData = exports.BLEManufacturerData || (exports.BLEManufacturerData = {}));
-var BLEService;
-(function (BLEService) {
-    BLEService["WEDO2_SMART_HUB"] = "00001523-1212-efde-1523-785feabcd123";
-    BLEService["WEDO2_SMART_HUB_2"] = "00004f0e-1212-efde-1523-785feabcd123";
-    BLEService["WEDO2_SMART_HUB_3"] = "2a19";
-    BLEService["WEDO2_SMART_HUB_4"] = "180f";
-    BLEService["WEDO2_SMART_HUB_5"] = "180a";
-    BLEService["LPF2_HUB"] = "00001623-1212-efde-1623-785feabcd123";
-})(BLEService = exports.BLEService || (exports.BLEService = {}));
-var BLECharacteristic;
-(function (BLECharacteristic) {
-    BLECharacteristic["WEDO2_BATTERY"] = "2a19";
-    BLECharacteristic["WEDO2_FIRMWARE_REVISION"] = "2a26";
-    BLECharacteristic["WEDO2_BUTTON"] = "00001526-1212-efde-1523-785feabcd123";
-    BLECharacteristic["WEDO2_PORT_TYPE"] = "00001527-1212-efde-1523-785feabcd123";
-    BLECharacteristic["WEDO2_LOW_VOLTAGE_ALERT"] = "00001528-1212-efde-1523-785feabcd123";
-    BLECharacteristic["WEDO2_HIGH_CURRENT_ALERT"] = "00001529-1212-efde-1523-785feabcd123";
-    BLECharacteristic["WEDO2_LOW_SIGNAL_ALERT"] = "0000152a-1212-efde-1523-785feabcd123";
-    BLECharacteristic["WEDO2_DISCONNECT"] = "0000152b-1212-efde-1523-785feabcd123";
-    BLECharacteristic["WEDO2_SENSOR_VALUE"] = "00001560-1212-efde-1523-785feabcd123";
-    BLECharacteristic["WEDO2_VALUE_FORMAT"] = "00001561-1212-efde-1523-785feabcd123";
-    BLECharacteristic["WEDO2_PORT_TYPE_WRITE"] = "00001563-1212-efde-1523-785feabcd123";
-    BLECharacteristic["WEDO2_MOTOR_VALUE_WRITE"] = "00001565-1212-efde-1523-785feabcd123";
-    BLECharacteristic["WEDO2_NAME_ID"] = "00001524-1212-efde-1523-785feabcd123";
-    BLECharacteristic["LPF2_ALL"] = "00001624-1212-efde-1623-785feabcd123";
-})(BLECharacteristic = exports.BLECharacteristic || (exports.BLECharacteristic = {}));
-//# sourceMappingURL=consts.js.map</pre>
+class PoweredUP extends events_1.EventEmitter {
+    constructor() {
+        super();
+        this.autoSubscribe = true;
+        this._connectedHubs = {};
+        this._discoveryEventHandler = this._discoveryEventHandler.bind(this);
+    }
+    /**
+     * Begin scanning for Powered UP Hub devices.
+     * @method PoweredUP#scan
+     */
+    async scan() {
+        wantScan = true;
+        if (!discoveryEventAttached) {
+            noble.on("discover", this._discoveryEventHandler);
+            discoveryEventAttached = true;
+        }
+        if (ready) {
+            debug("Scanning started");
+            startScanning();
+        }
+        return true;
+    }
+    /**
+     * Stop scanning for Powered UP Hub devices.
+     * @method PoweredUP#stop
+     */
+    stop() {
+        wantScan = false;
+        if (discoveryEventAttached) {
+            noble.removeListener("discover", this._discoveryEventHandler);
+            discoveryEventAttached = false;
+        }
+        noble.stopScanning();
+    }
+    /**
+     * Retrieve a list of Powered UP Hubs.
+     * @method PoweredUP#getConnectedHubs
+     * @returns {Hub[]}
+     */
+    getConnectedHubs() {
+        return Object.keys(this._connectedHubs).map((uuid) => this._connectedHubs[uuid]);
+    }
+    /**
+     * Retrieve a Powered UP Hub by UUID.
+     * @method PoweredUP#getConnectedHubByUUID
+     * @param {string} uuid
+     * @returns {Hub | null}
+     */
+    getConnectedHubByUUID(uuid) {
+        return this._connectedHubs[uuid];
+    }
+    /**
+     * Retrieve a list of Powered UP Hub by name.
+     * @method PoweredUP#getConnectedHubsByName
+     * @param {string} name
+     * @returns {Hub[]}
+     */
+    getConnectedHubsByName(name) {
+        return Object.keys(this._connectedHubs).map((uuid) => this._connectedHubs[uuid]).filter((hub) => hub.name === name);
+    }
+    async _discoveryEventHandler(peripheral) {
+        const device = new nobledevice_1.NobleDevice(peripheral);
+        let hub;
+        if (await wedo2smarthub_1.WeDo2SmartHub.IsWeDo2SmartHub(peripheral)) {
+            hub = new wedo2smarthub_1.WeDo2SmartHub(device, this.autoSubscribe);
+        }
+        else if (await boostmovehub_1.BoostMoveHub.IsBoostMoveHub(peripheral)) {
+            hub = new boostmovehub_1.BoostMoveHub(device, this.autoSubscribe);
+        }
+        else if (await puphub_1.PUPHub.IsPUPHub(peripheral)) {
+            hub = new puphub_1.PUPHub(device, this.autoSubscribe);
+        }
+        else if (await pupremote_1.PUPRemote.IsPUPRemote(peripheral)) {
+            hub = new pupremote_1.PUPRemote(device, this.autoSubscribe);
+        }
+        else if (await duplotrainbase_1.DuploTrainBase.IsDuploTrainBase(peripheral)) {
+            hub = new duplotrainbase_1.DuploTrainBase(device, this.autoSubscribe);
+        }
+        else {
+            return;
+        }
+        peripheral.removeAllListeners();
+        device.on("discoverComplete", () => {
+            hub.on("connect", () => {
+                debug(`Hub ${hub.uuid} connected`);
+                this._connectedHubs[hub.uuid] = hub;
+            });
+            hub.on("disconnect", () => {
+                debug(`Hub ${hub.uuid} disconnected`);
+                delete this._connectedHubs[hub.uuid];
+                if (wantScan) {
+                    startScanning();
+                }
+            });
+            debug(`Hub ${hub.uuid} discovered`);
+            /**
+             * Emits when a Powered UP Hub device is found.
+             * @event PoweredUP#discover
+             * @param {WeDo2SmartHub | BoostMoveHub | PUPHub | PUPRemote | DuploTrainBase} hub
+             */
+            this.emit("discover", hub);
+        });
+    }
+}
+exports.PoweredUP = PoweredUP;
+//# sourceMappingURL=poweredup-node.js.map</pre>
     </article>
 </section>
 

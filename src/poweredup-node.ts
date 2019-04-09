@@ -3,11 +3,10 @@ import { Peripheral } from "noble-mac";
 import { BoostMoveHub } from "./boostmovehub";
 import { DuploTrainBase } from "./duplotrainbase";
 import { Hub } from "./hub";
+import { NobleDevice } from "./nobledevice";
 import { PUPHub } from "./puphub";
 import { PUPRemote } from "./pupremote";
 import { WeDo2SmartHub } from "./wedo2smarthub";
-
-import { isBrowserContext } from "./utils";
 
 import * as Consts from "./consts";
 
@@ -22,11 +21,7 @@ let wantScan = false;
 let discoveryEventAttached = false;
 
 const startScanning = () => {
-    if (isBrowserContext) {
-        noble.startScanning([Consts.BLEService.WEDO2_SMART_HUB, Consts.BLEService.LPF2_HUB]);
-    } else {
-        noble.startScanning();
-    }
+    noble.startScanning();
 };
 
 noble.on("stateChange", (state: string) => {
@@ -64,7 +59,7 @@ export class PoweredUP extends EventEmitter {
      * Begin scanning for Powered UP Hub devices.
      * @method PoweredUP#scan
      */
-    public scan () {
+    public async scan () {
         wantScan = true;
 
         if (!discoveryEventAttached) {
@@ -76,6 +71,8 @@ export class PoweredUP extends EventEmitter {
             debug("Scanning started");
             startScanning();
         }
+
+        return true;
     }
 
 
@@ -129,29 +126,27 @@ export class PoweredUP extends EventEmitter {
 
     private async _discoveryEventHandler (peripheral: Peripheral) {
 
+        const device = new NobleDevice(peripheral);
+
         let hub: Hub;
 
         if (await WeDo2SmartHub.IsWeDo2SmartHub(peripheral)) {
-            hub = new WeDo2SmartHub(peripheral, this.autoSubscribe);
+            hub = new WeDo2SmartHub(device, this.autoSubscribe);
         } else if (await BoostMoveHub.IsBoostMoveHub(peripheral)) {
-            hub = new BoostMoveHub(peripheral, this.autoSubscribe);
+            hub = new BoostMoveHub(device, this.autoSubscribe);
         } else if (await PUPHub.IsPUPHub(peripheral)) {
-            hub = new PUPHub(peripheral, this.autoSubscribe);
+            hub = new PUPHub(device, this.autoSubscribe);
         } else if (await PUPRemote.IsPUPRemote(peripheral)) {
-            hub = new PUPRemote(peripheral, this.autoSubscribe);
+            hub = new PUPRemote(device, this.autoSubscribe);
         } else if (await DuploTrainBase.IsDuploTrainBase(peripheral)) {
-            hub = new DuploTrainBase(peripheral, this.autoSubscribe);
+            hub = new DuploTrainBase(device, this.autoSubscribe);
         } else {
             return;
         }
 
         peripheral.removeAllListeners();
-        // noble.stopScanning();
-        // if (!isBrowserContext) {
-        //     startScanning();
-        // }
 
-        hub.on("discoverComplete", () => {
+        device.on("discoverComplete", () => {
 
             hub.on("connect", () => {
                 debug(`Hub ${hub.uuid} connected`);

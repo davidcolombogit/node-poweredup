@@ -24,19 +24,18 @@ export class LPF2Hub extends Hub {
     public connect () {
         return new Promise(async (resolve, reject) => {
             await super.connect();
-            const characteristic = this._getCharacteristic(Consts.BLECharacteristic.LPF2_ALL);
-            this._subscribeToCharacteristic(characteristic, this._parseMessage.bind(this));
-            setTimeout(() => {
-                this._writeMessage(Consts.BLECharacteristic.LPF2_ALL, Buffer.from([0x01, 0x02, 0x02])); // Activate button reports
-                this._writeMessage(Consts.BLECharacteristic.LPF2_ALL, Buffer.from([0x01, 0x03, 0x05])); // Request firmware version
-                this._writeMessage(Consts.BLECharacteristic.LPF2_ALL, Buffer.from([0x01, 0x06, 0x02])); // Activate battery level reports
-                this._writeMessage(Consts.BLECharacteristic.LPF2_ALL, Buffer.from([0x41, 0x3c, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01])); // Activate voltage reports
-                this._writeMessage(Consts.BLECharacteristic.LPF2_ALL, Buffer.from([0x41, 0x3b, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01])); // Activate current reports
-                if (this.type === Consts.HubType.DUPLO_TRAIN_HUB) {
-                    this._writeMessage(Consts.BLECharacteristic.LPF2_ALL, Buffer.from([0x41, 0x01, 0x01, 0x01, 0x00, 0x00, 0x00, 0x01]));
-                }
-            }, 1000);
-            return resolve();
+            await this._bleDevice.discoverCharacteristicsForService(Consts.BLEService.LPF2_HUB);
+            this._bleDevice.subscribeToCharacteristic(Consts.BLECharacteristic.LPF2_ALL, this._parseMessage.bind(this));
+            this.emit("connect");
+            resolve();
+            this._writeMessage(Consts.BLECharacteristic.LPF2_ALL, Buffer.from([0x01, 0x02, 0x02])); // Activate button reports
+            this._writeMessage(Consts.BLECharacteristic.LPF2_ALL, Buffer.from([0x01, 0x03, 0x05])); // Request firmware version
+            this._writeMessage(Consts.BLECharacteristic.LPF2_ALL, Buffer.from([0x01, 0x06, 0x02])); // Activate battery level reports
+            this._writeMessage(Consts.BLECharacteristic.LPF2_ALL, Buffer.from([0x41, 0x3c, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01])); // Activate voltage reports
+            this._writeMessage(Consts.BLECharacteristic.LPF2_ALL, Buffer.from([0x41, 0x3b, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01])); // Activate current reports
+            if (this.type === Consts.HubType.DUPLO_TRAIN_HUB) {
+                this._writeMessage(Consts.BLECharacteristic.LPF2_ALL, Buffer.from([0x41, 0x01, 0x01, 0x01, 0x00, 0x00, 0x00, 0x01]));
+            }
         });
     }
 
@@ -136,13 +135,10 @@ export class LPF2Hub extends Hub {
 
 
     protected _writeMessage (uuid: string, message: Buffer, callback?: () => void) {
-        const characteristic = this._getCharacteristic(uuid);
-        if (characteristic) {
-            message = Buffer.concat([Buffer.alloc(2), message]);
-            message[0] = message.length;
-            debug("Sent Message (LPF2_ALL)", message);
-            characteristic.write(message, false, callback);
-        }
+        message = Buffer.concat([Buffer.alloc(2), message]);
+        message[0] = message.length;
+        debug("Sent Message (LPF2_ALL)", message);
+        this._bleDevice.writeToCharacteristic(uuid, message, callback);
     }
 
 

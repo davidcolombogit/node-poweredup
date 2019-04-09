@@ -6,6 +6,7 @@ import { Port } from "./port";
 import * as Consts from "./consts";
 
 import Debug = require("debug");
+import { IBLEDevice } from "./interfaces";
 const debug = Debug("duplotrainbase");
 
 
@@ -57,12 +58,14 @@ export class DuploTrainBase extends LPF2Hub {
 
 
     public static IsDuploTrainBase (peripheral: Peripheral) {
-        return (peripheral.advertisement.serviceUuids.indexOf(Consts.BLEService.LPF2_HUB.replace(/-/g, "")) >= 0 && peripheral.advertisement.manufacturerData[3] === Consts.BLEManufacturerData.DUPLO_TRAIN_HUB_ID);
+        return (peripheral.advertisement &&
+            peripheral.advertisement.serviceUuids &&
+            peripheral.advertisement.serviceUuids.indexOf(Consts.BLEService.LPF2_HUB.replace(/-/g, "")) >= 0 && peripheral.advertisement.manufacturerData[3] === Consts.BLEManufacturerData.DUPLO_TRAIN_HUB_ID);
     }
 
 
-    constructor (peripheral: Peripheral, autoSubscribe: boolean = true) {
-        super(peripheral, autoSubscribe);
+    constructor (device: IBLEDevice, autoSubscribe: boolean = true) {
+        super(device, autoSubscribe);
         this.type = Consts.HubType.DUPLO_TRAIN_HUB;
         this._ports = {
             "MOTOR": new Port("MOTOR", 0),

@@ -1,22 +1,15 @@
-[![CircleCI](https://circleci.com/gh/nathankellenicki/node-poweredup.svg?style=shield)](https://circleci.com/gh/nathankellenicki/node-poweredup)
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/node-poweredup?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-![NPM Version](https://img.shields.io/npm/v/node-poweredup.svg?style=flat)
+[![Drone](https://drone.kellenicki.com/api/badges/nkellenicki/node-poweredup/status.svg)](https://drone.kellenicki.com/nkellenicki/node-poweredup)
+[![NPM Version](https://img.shields.io/npm/v/node-poweredup.svg?style=flat)](https://www.npmjs.com/package/node-poweredup)
 
-# **node-poweredup** - A Node.js module to interface with LEGO Powered UP components.
+# **node-poweredup** - A Javascript module to interface with LEGO Powered UP components.
 
 ### Introduction
 
 LEGO Powered UP is the successor to Power Functions, the system for adding electronics to LEGO models. Powered UP is a collection of ranges - starting with LEGO WeDo 2.0 released in 2016, LEGO Boost released in 2017, and LEGO Powered UP released in 2018. It also includes the 2018 Duplo App-Controlled Train sets.
 
-Powered UP has a few improvements over Power Functions:
+This library allows communication and control of Powered UP devices and peripherals via Javascript, both from Node.js and from the browser using Web Bluetooth.
 
-1. The use of Bluetooth Low Energy makes it easy to control from a computer, and even write code for.
-
-2. The ability to use sensors to react to events happening in the real world opens up a whole new world of possibilities.
-
-3. As Powered UP hubs and remotes pair with each other, the system allows for a near unlimited number of independently controlled models in the same room. Power Functions was limited to 8 due to the use of infra-red for communication.
-
-### Installation
+### Node.js Installation
 
 Node.js v8.0 required.
 
@@ -67,26 +60,32 @@ In addition, the Hubs themselves have certain built-in features which this libra
 
 [Full documentation is available here.](https://nathankellenicki.github.io/node-poweredup/)
 
-### Sample Usage
+### Node.js Sample Usage
 
 ```javascript
 const PoweredUP = require("node-poweredup");
 const poweredUP = new PoweredUP.PoweredUP();
 
 poweredUP.on("discover", async (hub) => { // Wait to discover a Hub
+    console.log(`Discovered ${hub.name}!`);
     await hub.connect(); // Connect to the Hub
+    console.log("Connected");
     await hub.sleep(3000); // Sleep for 3 seconds before starting
 
     while (true) { // Repeat indefinitely
+        console.log("Running motor B at speed 75");
         hub.setMotorSpeed("B", 75); // Start a motor attached to port B to run a 3/4 speed (75) indefinitely
+        console.log("Running motor A at speed 100 for 2 seconds");
         await hub.setMotorSpeed("A", 100,  2000); // Run a motor attached to port A for 2 seconds at maximum speed (100) then stop
         await hub.sleep(1000); // Do nothing for 1 second
+        console.log("Running motor A at speed -50 for 1 seconds");
         await hub.setMotorSpeed("A", -50,  1000); // Run a motor attached to port A for 1 second at 1/2 speed in reverse (-50) then stop
         await hub.sleep(1000); // Do nothing for 1 second
     }
 });
 
 poweredUP.scan(); // Start scanning for Hubs
+console.log("Scanning for Hubs...");
 ```
 
 More examples are available in the "examples" directory.
